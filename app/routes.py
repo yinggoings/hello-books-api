@@ -84,11 +84,13 @@ def handle_author_books(author_id):
                 }
             )
         return jsonify(books_response)
+        
     elif request.method == "POST":
         request_body = request.get_json()
+        requested_author = Author.query.get(id=author_id)
         new_book = Book(title=request_body["title"],
                         description=request_body["description"],
-                        author_id=author_id)
+                        author=requested_author)
 
         db.session.add(new_book)
         db.session.commit()

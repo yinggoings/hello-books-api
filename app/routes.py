@@ -1,10 +1,12 @@
 from app import db
 from app.models.book import Book
 from app.models.author import Author
+from app.models.genre import Genre
 from flask import request, Blueprint, make_response, jsonify
 
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
+genres_bp = Blueprint("genres", __name__, url_prefix="/genres")
 
 @books_bp.route("", methods=["GET", "POST"])
 def handle_books():
@@ -55,6 +57,21 @@ def handle_book(book_id):
         db.session.commit()
         return make_response(f"Book #{book.id} successfully deleted")
 
+@books_bp.route("/<book_id>/assign_genres", methods=["PATCH"])
+def assign_genres(book_id):
+    book = Book.query.get(id=book_id)
+
+    if book is None:
+        return make_response(f"Book #{book.id} not found", 404)
+    
+    request_body = request.get_json()
+
+    for id in request_body["genres"]:
+        book.genres.add(Genre.query.get(id=id))
+    db.session.commit()
+
+    return make_response("Genres successfully added", 200)
+
 @authors_bp.route("", methods=["POST"])
 def create_author():
         request_body = request.get_json()
@@ -97,3 +114,13 @@ def handle_author_books(author_id):
 
         return make_response(f"Book {new_book.title} by {new_book.author.name} successfully created", 201)
 
+@genres_bp.route("", methods=["POST"])
+def create_genres():
+    request_body = request.get_json()
+
+    genre = Genre(name=request_body["name"])
+
+    db.session.add(genre)
+    db.session.commit()
+
+    return jsonify(f"Genre {genre.name} was successfully created"), 201

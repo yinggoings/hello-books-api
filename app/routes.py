@@ -14,11 +14,7 @@ def handle_books():
         books = Book.query.all()
         books_response = []
         for book in books:
-            books_response.append({
-                "id": book.id,
-                "title": book.title,
-                "description": book.description
-            })
+            books_response.append(book.to_dict())
         return jsonify(books_response)
     elif request.method == "POST":
         request_body = request.get_json()
@@ -59,7 +55,7 @@ def handle_book(book_id):
 
 @books_bp.route("/<book_id>/assign_genres", methods=["PATCH"])
 def assign_genres(book_id):
-    book = Book.query.get(id=book_id)
+    book = Book.query.get(book_id)
 
     if book is None:
         return make_response(f"Book #{book.id} not found", 404)
@@ -67,7 +63,7 @@ def assign_genres(book_id):
     request_body = request.get_json()
 
     for id in request_body["genres"]:
-        book.genres.add(Genre.query.get(id=id))
+        book.genres.append(Genre.query.get(id))
     db.session.commit()
 
     return make_response("Genres successfully added", 200)
@@ -94,11 +90,7 @@ def handle_author_books(author_id):
         books_response = []
         for book in author.books:
             books_response.append(
-                {
-                "id": book.id,
-                "title": book.title,
-                "description": book.description
-                }
+                book.to_dict()
             )
         return jsonify(books_response)
         

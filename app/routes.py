@@ -106,13 +106,23 @@ def handle_author_books(author_id):
 
         return make_response(f"Book {new_book.title} by {new_book.author.name} successfully created", 201)
 
-@genres_bp.route("", methods=["POST"])
-def create_genres():
-    request_body = request.get_json()
+@genres_bp.route("", methods=["GET","POST"])
+def handle_genres():
+    if request.method == "GET":
+        genres = Genre.query.all()
+        genres_response = []
+        for genre in genres:
+            genres_response.append({
+                "id": genre.id,
+                "name": genre.name
+                })
+        return jsonify(genres_response)
+    elif request.method == "POST":
+        request_body = request.get_json()
 
-    genre = Genre(name=request_body["name"])
+        genre = Genre(name=request_body["name"])
 
-    db.session.add(genre)
-    db.session.commit()
+        db.session.add(genre)
+        db.session.commit()
 
-    return jsonify(f"Genre {genre.name} was successfully created"), 201
+        return jsonify(f"Genre {genre.name} was successfully created"), 201

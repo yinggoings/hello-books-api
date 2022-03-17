@@ -5,4 +5,4 @@ class Book(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     author_id = db.Column(db.Integer,db.ForeignKey('author.id'))
-    authors = db.relationship("Author",back_populates="books")
+    author = db.relationship("Author",back_populates="books")

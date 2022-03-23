@@ -21,7 +21,6 @@ def handle_books():
             books = Book.query.filter_by(title=title_query)
         else:
             books = Book.query.all()
-        # books = Book.query.all()
         books_response = []
         for book in books:
             books_response.append({
@@ -73,7 +72,7 @@ def author_info():
 
 @authors_bp.route("/<author_id>/books",methods=["GET","POST"])
 def handle_authors_books(author_id):
-    author = Author.query.get(author_id)
+    author = Author.query.get(id=author_id)
     if author is None:
         return make_response(f"Author ID {author_id} not found", 404)
     if request.method == "POST":

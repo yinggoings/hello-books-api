@@ -68,11 +68,11 @@ def author_info():
         new_author = Author(name=request_body["name"])
         db.session.add(new_author)
         db.session.commit()
-        return make_response(f"Autor {new_author.name} successfully created", 201)
+        return make_response(f"Author {new_author.name} successfully created", 201)
 
 @authors_bp.route("/<author_id>/books",methods=["GET","POST"])
 def handle_authors_books(author_id):
-    author = Author.query.get(id=author_id)
+    author = Author.query.get(author_id)
     if author is None:
         return make_response(f"Author ID {author_id} not found", 404)
     if request.method == "POST":
@@ -80,7 +80,7 @@ def handle_authors_books(author_id):
         new_book = Book(
             title = request_body["title"],
             description = request_body["description"],
-            author = author.name
+            author_id = author_id
         )
         db.session.add(new_book)
         db.session.commit()

@@ -1,3 +1,4 @@
+from re import L
 from app import db
 from app.models.book import Book
 from app.models.author import Author
@@ -25,10 +26,14 @@ def handle_books():
             books = Book.query.all()
         books_response = []
         for book in books:
+            book = book.to_dict()
+            print(book)
             books_response.append({
-                "id":book.id,
-                "title":book.title,
-                "description":book.description
+                "id":book["id"],
+                "title":book["title"],
+                "description":book["description"],
+                "genres":book["genres"],
+                "author":book["author"]
             })
         return jsonify(books_response)
         
@@ -38,10 +43,13 @@ def handle_book(book_id):
     if book is None:
         return make_response(f"Book #{book_id} is invalid",404)
     if request.method=="GET":
+        book = book.to_dict()
         return {
-            "id":book.id,
-            "title":book.title,
-            "description":book.description
+            "id":book["id"],
+            "title":book["title"],
+            "description":book["description"],
+            "genres":book["genres"],
+            "author":book["author"]
         }
     elif request.method=="PUT":
         form_data = request.get_json()
@@ -53,6 +61,17 @@ def handle_book(book_id):
         db.session.delete(book)
         db.session.commit()
         return make_response(f"Book #{book.id} successfully deleted", 201)
+
+@books_bp.route("/<book_id>/assign_genres",methods=["PATCH"])
+def assign_genres(book_id):
+    book = Book.query.get(book_id)
+    if book is None:
+        return make_response(f"Book #{book.id} not found", 404)
+    request_body = request.get_json()
+    for id in request_body["genres"]:
+        book.genres.append(Genre.query.get(id))
+    db.session.commit()
+    return make_response("Genres successfully added", 200)
 
 @authors_bp.route("",methods=["GET","POST"])
 def author_info():
@@ -117,6 +136,17 @@ def handle_genres():
         return make_response(f"Genre {new_genre.name} successfully created", 201)
 
 
+@genres_bp.route("/<genre_id>/assign_books",methods=["POST"])
+def assign_books(genre_id):
+    if request.method == "POST":
+        genre = Genre.query.get(genre_id)
+        if genre is None:
+            return make_response(f"Genre #{genre.id} not found", 404)
+        request_body = request.get_json()
+        for id in request_body["books"]:
+            genre.books.append(Book.query.get(id))
+        db.session.commit()
+        return make_response("Books successfully added to genres", 200)
 
 
 

@@ -1,10 +1,12 @@
 from app import db
 from app.models.book import Book
 from app.models.author import Author
+from app.models.genre import Genre
 from flask import Blueprint, jsonify, make_response, request, abort
 
 books_bp = Blueprint("books",__name__,url_prefix="/books")
 authors_bp = Blueprint("authors",__name__,url_prefix="/authors")
+genres_bp = Blueprint("genres",__name__,url_prefix="/genres")
 
 @books_bp.route("",methods=["GET","POST"])
 def handle_books():
@@ -95,6 +97,25 @@ def handle_authors_books(author_id):
             )
         return jsonify(books_response)
     
+
+@genres_bp.route("",methods=["GET","POST"])
+def handle_genres():
+    if request.method == "GET":
+        genres = Genre.query.all()
+        genres_response = []
+        for genre in genres:
+            genres_response.append({
+                "id":genre.id,
+                "name":genre.name
+            })
+        return jsonify(genres_response)
+    elif request.method == "POST":
+        request_body = request.get_json()
+        new_genre = Genre(name=request_body["name"])
+        db.session.add(new_genre)
+        db.session.commit()
+        return make_response(f"Genre {new_genre.name} successfully created", 201)
+
 
 
 

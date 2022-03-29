@@ -1,8 +1,8 @@
-"""adds Author model
+"""alembic is a fucking retard
 
-Revision ID: 73b7c32db6d0
-Revises: 95ab45c4f1d2
-Create Date: 2022-03-17 15:40:49.647788
+Revision ID: 561ee02c402f
+Revises: 
+Create Date: 2022-03-24 12:30:12.504414
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '73b7c32db6d0'
-down_revision = '95ab45c4f1d2'
+revision = '561ee02c402f'
+down_revision = None
 branch_labels = None
 depends_on = None
 
